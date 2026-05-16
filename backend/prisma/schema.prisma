@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id              String    @id @default(uuid())
+  telegramId      BigInt    @unique
+  username        String?
+  tokens          Int       @default(3)
+  isPremium       Boolean   @default(false)
+  referredBy      BigInt?   // Telegram ID of referrer
+  createdAt       DateTime  @default(now())
+  
+  tasks           Task[]
+  referrals       Referral[] @relation("Referrer")
+  refereeRecord   Referral?  @relation("Referee")
+}
+
+model Template {
+  id              String    @id @default(uuid())
+  slug            String    @unique // e.g., 'cyberpunk-pro'
+  category        String    // 'Useful', 'Fun', 'Trending'
+  title           String
+  previewBeforeUrl String
+  previewAfterUrl  String
+  basePrompt      String
+  instantIdConfig Json      // Model parameters, weights, etc.
+  isActive        Boolean   @default(true)
+  
+  tasks           Task[]
+}
+
+model Task {
+  id             String     @id @default(uuid())
+  userId         String
+  templateId     String
+  inputUrl       String
+  outputUrl      String?
+  status         Status     @default(PENDING)
+  errorMessage   String?
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  user           User       @relation(fields: [userId], references: [id])
+  template       Template   @relation(fields: [templateId], references: [id])
+}
+
+model Referral {
+  id             String     @id @default(uuid())
+  referrerId     String
+  refereeId      String     @unique
+  status         ReferralStatus @default(PENDING)
+  createdAt      DateTime   @default(now())
+
+  referrer       User       @relation("Referrer", fields: [referrerId], references: [id])
+  referee        User       @relation("Referee", fields: [refereeId], references: [id])
+}
+
+enum Status {
+  PENDING
+  PROCESSING
+  COMPLETED
+  FAILED
+}
+
+enum ReferralStatus {
+  PENDING
+  REWARDED
+}
