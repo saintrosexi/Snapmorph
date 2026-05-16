@@ -88,6 +88,7 @@ export default async function createServer() {
   });
 
   server.get('/api/health', async () => ({ status: 'ok' }));
+  server.get('/', async () => ({ status: 'PicCreate API is running!' }));
 
   return server;
 }
