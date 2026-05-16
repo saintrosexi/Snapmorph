@@ -9,7 +9,8 @@ interface Template {
   previewAfterUrl: string;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+// API URL from env
+// const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'create' | 'refer' | 'profile'>('create');
@@ -19,7 +20,7 @@ const App: React.FC = () => {
   const [customPrompt, setCustomPrompt] = useState('');
   const [userPhoto, setUserPhoto] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [tokens, setTokens] = useState(3);
+  const [tokens] = useState(3);
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
